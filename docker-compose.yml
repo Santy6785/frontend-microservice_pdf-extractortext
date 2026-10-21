@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:80"
     networks:
-      - pdf-extractortext_pdf-network
+      - shared_network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`universidad.localhost`)"
@@ -39,8 +39,9 @@ services:
 
 # ------------------------------------------------------------------
 # Red externa compartida con la infraestructura central y backend
+# Configurable mediante DOCKER_NETWORK_NAME (por defecto: pdf-extractortext_pdf-network)
 # ------------------------------------------------------------------
 networks:
-  pdf-extractortext_pdf-network:
+  shared_network:
     external: true
-    name: pdf-extractortext_pdf-network
+    name: ${DOCKER_NETWORK_NAME:-pdf-extractortext_pdf-network}

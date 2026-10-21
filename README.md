@@ -30,11 +30,23 @@ frontend/
 
 - **Node.js:** v18+ (recomendado Node 20+ con soporte nativo de `--test`).
 - **Docker & Docker Compose** (para empaquetado y ejecución contenerizada).
-- **Red Docker Compartida:** El microservicio interactúa con el backend y el reverse proxy Traefik mediante la red externa:
+- **Red Docker Compartida:** El microservicio interactúa con el backend y el reverse proxy Traefik mediante una red externa de Docker.
+  
+  Por defecto, la red configurada en `docker-compose.yml` es:
   ```bash
-  docker network create pdf-extractortext_pdf-network
+  pdf-extractortext_pdf-network
   ```
-  *(Si el backend o la infraestructura central ya están levantados, la red existirá previamente).*
+  *(Es el mismo nombre que define el backend en su propio `docker-compose.yml`).*
+
+  * **Si el backend ya está levantado:** la red ya existe y el frontend se unirá automáticamente.
+  * **Si se levanta el frontend de forma aislada:** crear la red manualmente con:
+    ```bash
+    docker network create pdf-extractortext_pdf-network
+    ```
+  * **Si se utiliza un nombre de red personalizado:** configurar la variable `DOCKER_NETWORK_NAME` en un archivo `.env` (puedes basarte en `.env.example`):
+    ```env
+    DOCKER_NETWORK_NAME=mi-red-personalizada
+    ```
 
 ---
 
