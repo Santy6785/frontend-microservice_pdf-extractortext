@@ -1,0 +1,19 @@
+# Ignorar control de versiones y dependencias locales
+.git
+.gitignore
+node_modules/
+
+# Ignorar archivos de variables de entorno y secretos
+.env
+.env.*
+.env.example
+
+# Ignorar documentacion, pruebas y herramientas de desarrollo fuera de la imagen
+docs/
+tests/
+postman/
+scripts/
+*.md
+build.ps1
+build.sh
+docker-compose.yml

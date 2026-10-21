@@ -1,0 +1,25 @@
+# Dependencias de Node
+node_modules/
+package-lock.json
+
+# Entorno y variables secretas
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Directorios de build / temporales
+dist/
+build/
+.cache/
+.tmp/
