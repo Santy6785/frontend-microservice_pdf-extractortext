@@ -1,0 +1,46 @@
+services:
+  # ------------------------------------------------------------------
+  # Microservicio Front-End (Nginx sirviendo UI estática y proxy /api)
+  # ------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdf-frontend
+    image: pdf-frontend:0.2.0
+    restart: unless-stopped
+    stop_signal: SIGQUIT
+    stop_grace_period: 10s
+    environment:
+      - API_BASE_PATH=
+      - MAX_UPLOAD_MB=10
+      - REQUEST_TIMEOUT_MS=30000
+    expose:
+      - "80"
+    ports:
+      - "8080:80"
+    networks:
+      - pdf-extractortext_pdf-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`universidad.localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=https"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.priority=10"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.services.frontend.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.frontend.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.frontend.loadbalancer.healthcheck.timeout=3s"
+      # Middlewares de resiliencia
+      - "traefik.http.middlewares.frontend-retry.retry.attempts=3"
+      - "traefik.http.middlewares.frontend-retry.retry.initialinterval=500ms"
+      - "traefik.http.middlewares.frontend-cb.circuitbreaker.expression=NetworkErrorRatio() > 0.30 || ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+      - "traefik.http.routers.frontend.middlewares=frontend-retry,frontend-cb"
+
+# ------------------------------------------------------------------
+# Red externa compartida con la infraestructura central y backend
+# ------------------------------------------------------------------
+networks:
+  pdf-extractortext_pdf-network:
+    external: true
+    name: pdf-extractortext_pdf-network
