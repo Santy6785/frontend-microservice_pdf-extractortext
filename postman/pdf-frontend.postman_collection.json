@@ -1,0 +1,53 @@
+{
+  "info": {
+    "_postman_id": "b3e0c7a1-8d25-450f-90b5-e6a8e8947f12",
+    "name": "PDF Extractor - Frontend Microservice",
+    "description": "Colección de pruebas para el microservicio front-end (UI estática y Health Check en Nginx).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Frontend UI",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            ""
+          ]
+        },
+        "description": "Obtiene la interfaz de usuario del microservicio front-end (index.html)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Frontend Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Health check del microservicio front-end estático servido por Nginx"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
