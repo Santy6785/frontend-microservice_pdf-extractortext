@@ -3,7 +3,7 @@
 > **Fuente de verdad:** OpenAPI 3.1.0 generado automáticamente desde `app/main.py` y `app/api/routes.py` (inspección de código y exportación `docs/openapi.json`).  
 > **Versión de la API:** 0.2.0  
 > **Prefijo global:** `/api/v1`  
-> **Mapeo Traefik / Origen:** Peticiones relativas del navegador dirigidas a `/api/v1/...` son enrutadas a la API backend sin `StripPrefix`.
+> **Mapeo Traefik / Origen:** El navegador llama a `/api` por el mismo origen y Traefik lo enruta al orquestador sin `StripPrefix`.
 
 ---
 
@@ -158,5 +158,5 @@
 | `409` | Checksum SHA-256 duplicado. | JSON: `{"detail": "Ya existe un documento con el mismo checksum"}` | Mostrar mensaje de duplicado en UI. |
 | `422` | PDF ilegible/corrupto o error de esquema Pydantic. | JSON: `{"detail": "..."}` o `{"detail": [...]}` | Parsear defensivamente (string o array de errores) y presentar mensaje legible. |
 | `429` | Rate limit Traefik excedido. | Texto o JSON de proxy | Notificar límite alcanzado y ofrecer reintento manual. |
-| `502 / 503 / 504` | Backend caído / circuito abierto Traefik / gateway timeout. | HTML/texto de Traefik o Nginx | No romper UI; mostrar error de servicio no disponible y habilitar reintento manual. |
+| `502 / 503 / 504` | Backend caído / circuito abierto Traefik / gateway timeout. | HTML/texto de Traefik | No romper UI; mostrar error de servicio no disponible y habilitar reintento manual. |
 | `Timeout / Red` | Petición abortada o fallo de red. | Excepción TypeError/DOMException | Notificar fallo de conexión/timeout y reintentar sólo si es GET. |
