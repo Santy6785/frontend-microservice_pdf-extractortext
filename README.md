@@ -123,6 +123,12 @@ Para ejecutar linting, todas las pruebas y construir la imagen Docker en un solo
 
 ---
 
+## 6. Decisiones Arquitectónicas
+
+Para obtener el detalle completo de la excepción del front-end en endpoints operativos (/shutdown, /pause, /resume, /trace y métricas completas), consultar el [ADR-001](#adr-001-excepcion-del-front-end-en-endpoints-operativos-shutdown-pause-resume-trace-metricas-complejas) en `docs/decisiones.md`.
+
+---
+
 ## 6. Contrato de API y OpenAPI Snapshot
 
 > [!NOTE]

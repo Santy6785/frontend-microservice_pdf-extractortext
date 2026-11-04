@@ -46,7 +46,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:8080",
+      "value": "https://universidad.localhost",
       "type": "string"
     }
   ]
