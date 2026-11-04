@@ -60,15 +60,37 @@ Levanta el frontend conectado a la red compartida y con soporte para Traefik:
 docker compose up --build -d
 ```
 
-* **Acceso directo HTTP:** `http://localhost:8080`
 * **Acceso mediante Traefik:** `https://universidad.localhost`
-* **Health Check:** `http://localhost:8080/health` (retorna `{"status":"ok","service":"frontend"}`)
+* **Health Check (vía Traefik):** `https://universidad.localhost/health` (retorna `{"status":"ok","service":"frontend"}`)
+
+> [!NOTE]
+> **Sin puertos publicados en el host:** El servicio no expone puertos hacia el host (`ports` eliminado) para asegurar que todo el tráfico transite a través del reverse proxy Traefik, aprovechando el balanceo de carga, comprobaciones de salud y middlewares de resiliencia (retry y circuit breaker).
+>
+> **Resolución de nombres local (`universidad.localhost`):**  
+> Si su sistema operativo o cliente HTTP de consola no resuelve dominios `.localhost` a `127.0.0.1` automáticamente (por ejemplo, en Windows PowerShell o curl sin resolvedor interno de navegador), agregue la siguiente entrada a su archivo `hosts` (`C:\Windows\System32\drivers\etc\hosts` en Windows o `/etc/hosts` en Linux/macOS):
+> ```text
+> 127.0.0.1 universidad.localhost
+> ```
+> Alternativamente, puede enviar la cabecera `Host` explícita:
+> ```bash
+> curl -k -i -H "Host: universidad.localhost" https://localhost/
+> ```
+>
+> **Comprobación interna del contenedor (sin puerto publicado):**
+> * Desde el propio contenedor:
+>   ```bash
+>   docker compose exec frontend wget -q -O - http://127.0.0.1/health
+>   ```
+> * Desde la red compartida Docker:
+>   ```bash
+>   docker run --rm --network pdf-extractortext_pdf-network curlimages/curl -s http://pdf-frontend/health
+>   ```
 
 ### Opción B: Construcción directa con Docker
 
 ```bash
 docker build -t pdf-frontend:0.2.0 -t pdf-frontend:latest .
-docker run -d --name pdf-frontend -p 8080:80 --network pdf-extractortext_pdf-network pdf-frontend:0.2.0
+docker run -d --name pdf-frontend --network pdf-extractortext_pdf-network pdf-frontend:0.2.0
 ```
 
 ---
