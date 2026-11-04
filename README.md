@@ -64,6 +64,14 @@ docker compose up --build -d
 * **Acceso mediante Traefik:** `https://universidad.localhost`
 * **Health Check:** `http://localhost:8080/health` (retorna `{"status":"ok","service":"frontend"}`)
 
+#### Contrato de Enrutamiento y Prioridades en Traefik
+
+Para garantizar la coexistencia sin colisiones en el dominio compartido `universidad.localhost`:
+* **Front-End (`frontend`):** Atiende la UI (`/`) con regla `Host(`universidad.localhost`) && !PathPrefix(`/api`)` y prioridad baja explícita (`priority=1`), garantizando que ninguna llamada a `/api` sea absorbida por Nginx.
+* **Orquestador (`orquestador`):** Debe atender el tráfico de API con regla `Host(`universidad.localhost`) && PathPrefix(`/api`)`, prioridad alta (`priority=20`) y **SIN middleware StripPrefix** (la API ya monta sus rutas bajo `/api/v1`).
+
+Para el snippet completo y detalles de configuración, consulte [`docs/traefik-routing.md`](docs/traefik-routing.md).
+
 ### Opción B: Construcción directa con Docker
 
 ```bash

@@ -23,10 +23,10 @@ services:
       - shared_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`universidad.localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`universidad.localhost`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.frontend.entrypoints=https"
       - "traefik.http.routers.frontend.tls=true"
-      - "traefik.http.routers.frontend.priority=10"
+      - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
       - "traefik.http.services.frontend.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.frontend.loadbalancer.healthcheck.interval=10s"
