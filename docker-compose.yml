@@ -15,6 +15,8 @@ services:
       - API_BASE_PATH=
       - MAX_UPLOAD_MB=10
       - REQUEST_TIMEOUT_MS=30000
+      - LOG_LEVEL=info
+      - ACCESS_LOG=on
     expose:
       - "80"
     networks:

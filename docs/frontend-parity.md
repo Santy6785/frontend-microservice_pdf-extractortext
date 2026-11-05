@@ -152,7 +152,7 @@ Leyenda:
 | **Manejo de códigos Traefik (429, 502, 503, 504)** | ⚠ Desviación justificada | Mensajes amigables y reintentos automáticos con backoff SOLO para GET. |
 | **Parseo defensivo de errores** | ⚠ Desviación justificada | Tolera respuestas JSON de FastAPI (string o lista de validación) y HTML de proxy. |
 | **Endpoint /health estático en Nginx** | ⚠ Desviación justificada | Retorna `{"status":"ok","service":"frontend"}` con código 200 para Docker y Traefik. |
-| **Logs JSON en Nginx sin datos sensibles** | ⚠ Desviación justificada | Registra método, ruta, código, latencia y tamaño; prohíbe contenidos o textos de PDFs. |
+| **Logs JSON en Nginx con esquema configurable** | ✔ Idéntico | Nginx usa `log_format json_fastapi` con `$uri` (NUNCA `$request_uri`), `escape=json`. El nivel y el acceso son configurables mediante `LOG_LEVEL` y `ACCESS_LOG` en runtime. El `error_log` usa formato nativo de nginx a stderr. No se registran datos sensibles (query strings ni cabeceras) en access log. Véase `nginx/nginx.conf` y el script `40-generate-config.sh`. |
 | **Parada ordenada por SIGQUIT** | ⚠ Desviación justificada | Permite que Nginx termine conexiones en vuelo antes del apagado. |
 
 **Total de ítems pendientes (✖): 0**
