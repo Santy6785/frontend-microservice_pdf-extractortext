@@ -17,8 +17,6 @@ services:
       - REQUEST_TIMEOUT_MS=30000
     expose:
       - "80"
-    ports:
-      - "8080:80"
     networks:
       - shared_network
     labels:
