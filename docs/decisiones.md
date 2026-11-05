@@ -128,6 +128,7 @@ Esto se verificó en la issue #6: ambos tiempos de medición fueron ~0.6-0.7 seg
 - [`Dockerfile`] línea 27 — `STOPSIGNAL SIGQUIT`
 - [`nginx/nginx.conf`] líneas 62-66 — `/health` location block
 - [`nginx/nginx.conf`] líneas 13-22 — `log_format json_fastapi` y `include /etc/nginx/log_access.conf` — formato FastAPI con `$uri` (NUNCA `$request_uri`), `escape=json`; `include /etc/nginx/log_error.conf` con nivel configurable
+- [`nginx/nginx.conf`] líneas 115-126 — `server` block en puerto 8081 con `stub_status` en `location = /metrics`; métricas básicas en texto plano, no accesible desde el host
 - Issue #2: "Sin `location /api/` ni `proxy_pass` en nginx" — garantiza aislamiento de rutas
 - Issue #3: "Reglas routers Traefik con `!PathPrefix` y prioridad baja" — enruteo correcto de tráfico
 - Issue #5: "Sin `ports:` en el servicio front" — exposición solo mediante `expose: ["80"]`
