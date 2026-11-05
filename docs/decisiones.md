@@ -21,7 +21,7 @@ El front-end es un sitio estático servido por Nginx en un contenedor independie
 | Requisito | Implementación actual | Evidencia |
 |---|---|---|
 | **/health** | Endpoint estático Nginx | `nginx/nginx.conf:62-66` define `location = /health` que retorna `200 OK` con `Content-Type: application/json` y cuerpo `{"status":"ok","service":"frontend"}` |
-| **Logs JSON** | Formato acceso JSON | `nginx/nginx.conf:13-22` define `log_format json_combined` registrando `method`, `request_uri`, `status`, `body_bytes_sent`, `request_time`; `error_log /dev/stderr warn`; no se registran nombres de archivo ni contenido de PDF |
+| **Logs JSON** | Logs configurables con esquema FastAPI | `nginx/nginx.conf:13-22` define `log_format json_fastapi` registrando `method`, `$uri`, `status`, `request_time`; `error_log /dev/stderr <nivel configurable>`; access_log con esquema JSON cuando ACCESS_LOG=on; no se registran nombres de archivo ni contenido de PDF |
 | **Apagado seguro** | SIGQUIT + grace period | `docker-compose.yml:12` `stop_signal: SIGQUIT`, `docker-compose.yml:13` `stop_grace_period: 10s`; Dockerfile `STOPSIGNAL SIGQUIT`; Nginx al recibir SIGQUIT realiza cierre ordenado (deja de aceptar conexiones nuevas, termina las en curso) |
 | **/trace** | No implementado en Nginx | No existe en `nginx/nginx.conf` ni en la configuración del contenedor |
 | **Métricas completas** | No implementado en Nginx | No hay contadores/objetivos de Prometheus expuestos en el front |
@@ -127,7 +127,7 @@ Esto se verificó en la issue #6: ambos tiempos de medición fueron ~0.6-0.7 seg
 - [`docker-compose.yml`] líneas 12-13 — `stop_signal: SIGQUIT`, `stop_grace_period: 10s`
 - [`Dockerfile`] línea 27 — `STOPSIGNAL SIGQUIT`
 - [`nginx/nginx.conf`] líneas 62-66 — `/health` location block
-- [`nginx/nginx.conf`] líneas 13-22 — `log_format json_combined` y `access_log /dev/stdout json_combined`
+- [`nginx/nginx.conf`] líneas 13-22 — `log_format json_fastapi` y `include /etc/nginx/log_access.conf` — formato FastAPI con `$uri` (NUNCA `$request_uri`), `escape=json`; `include /etc/nginx/log_error.conf` con nivel configurable
 - Issue #2: "Sin `location /api/` ni `proxy_pass` en nginx" — garantiza aislamiento de rutas
 - Issue #3: "Reglas routers Traefik con `!PathPrefix` y prioridad baja" — enruteo correcto de tráfico
 - Issue #5: "Sin `ports:` en el servicio front" — exposición solo mediante `expose: ["80"]`

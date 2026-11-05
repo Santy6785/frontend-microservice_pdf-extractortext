@@ -2,12 +2,21 @@
 # Nginx sirviendo contenido estático con configuración en runtime vía envsubst
 FROM nginx:alpine
 
+# Variables de entorno con valores por defecto
+ENV LOG_LEVEL=info
+ENV ACCESS_LOG=on
+
 # Copiar la configuración global optimizada de Nginx (con logs JSON y /health)
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Copiar script de inicialización para generar config.js con envsubst antes de iniciar Nginx
 COPY nginx/40-generate-config.sh /docker-entrypoint.d/40-generate-config.sh
 RUN chmod +x /docker-entrypoint.d/40-generate-config.sh
+
+# --- NUEVO: Crear fragmentos por defecto de log_error.conf y log_access.conf
+# Así nginx -t funciona aunque el script aún no se haya ejecutado en el contenedor
+RUN echo 'error_log /dev/stderr info;' > /etc/nginx/log_error.conf && \
+    echo 'access_log /dev/stdout json_fastapi;' > /etc/nginx/log_access.conf
 
 # Copiar archivos estáticos del frontend
 COPY frontend/ /usr/share/nginx/html/

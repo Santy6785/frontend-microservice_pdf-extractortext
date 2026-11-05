@@ -112,6 +112,20 @@ El contenedor inyecta las variables de entorno en runtime mediante `envsubst` a 
 | `API_BASE_PATH` | Prefijo o URL base de la API backend | `""` (Ruta relativa de mismo origen) |
 | `MAX_UPLOAD_MB` | Tamaño máximo permitido de PDF en MB | `10` |
 | `REQUEST_TIMEOUT_MS` | Timeout global para peticiones HTTP | `30000` (30 segundos) |
+| `LOG_LEVEL` | Nivel de log de error de Nginx | `info` |
+| `ACCESS_LOG` | Activar logs de acceso en JSON a stdout | `on` |
+
+| LOG_LEVEL | Efecto | Valores Válidos |
+|---|---|---|
+| `debug` | Nivel debug en `error_log /dev/stderr debug` (requiere nginx compilado con --with-debug) | debug, info, warn, error |
+| `info` | Nivel info en `error_log /dev/stderr info` (default) | |
+| `warn` | Nivel warn en `error_log /dev/stderr warn` | |
+| `error` | Nivel error en `error_log /dev/stderr error` | |
+
+| ACCESS_LOG | Efecto | Valores Válidos |
+|---|---|---|
+| `on` | `access_log /dev/stdout json_fastapi;` (una línea JSON por petición) | on, off |
+| `off` | `access_log off;` (sin líneas de acceso, incluye /health) | |
 
 ---
 
