@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+# Validar sintaxis de la configuración de Nginx antes de iniciar
+# Este paso impide que el contenedor inicie si nginx.conf tiene errores de sintaxis o de configuración
+nginx -t > /dev/null 2>&1 || {
+    echo "[Entrypoint] ERROR: La configuración de Nginx tiene errores de sintaxis o de configuración."
+    echo "[Entrypoint] Ejecute 'nginx -t' manualmente en el contenedor para ver los detalles."
+    exit 1
+}
+
 # Asignar valores por defecto a variables de entorno si no existen
 export API_BASE_PATH="${API_BASE_PATH:-}"
 export MAX_UPLOAD_MB="${MAX_UPLOAD_MB:-10}"
@@ -76,3 +84,8 @@ if [ -f /usr/share/nginx/html/config.template.js ]; then
 fi
 
 echo "[Entrypoint] Configuración de logging: LOG_LEVEL=${LOG_LEVEL}, ACCESS_LOG=${ACCESS_LOG}, error_log=Nginxlevel=${NGINX_LEVEL}"
+# Generar config.js desde config.template.js sustituyendo únicamente las variables de configuración
+if [ -f /usr/share/nginx/html/config.template.js ]; then
+    envsubst '$API_BASE_PATH $MAX_UPLOAD_MB $REQUEST_TIMEOUT_MS' < /usr/share/nginx/html/config.template.js > /usr/share/nginx/html/config.js
+    echo "[Entrypoint] Generado config.js con API_BASE_PATH='${API_BASE_PATH}', MAX_UPLOAD_MB=${MAX_UPLOAD_MB}, REQUEST_TIMEOUT_MS=${REQUEST_TIMEOUT_MS}"
+fi
