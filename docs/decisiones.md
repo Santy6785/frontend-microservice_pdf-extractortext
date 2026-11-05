@@ -23,7 +23,7 @@ El front-end es un sitio estático servido por Nginx en un contenedor independie
 | **/health** | Endpoint estático Nginx | `nginx/nginx.conf:62-66` define `location = /health` que retorna `200 OK` con `Content-Type: application/json` y cuerpo `{"status":"ok","service":"frontend"}` |
 | **Logs JSON** | Formato acceso JSON | `nginx/nginx.conf:13-22` define `log_format json_combined` registrando `method`, `request_uri`, `status`, `body_bytes_sent`, `request_time`; `error_log /dev/stderr warn`; no se registran nombres de archivo ni contenido de PDF |
 | **Apagado seguro** | SIGQUIT + grace period | `docker-compose.yml:12` `stop_signal: SIGQUIT`, `docker-compose.yml:13` `stop_grace_period: 10s`; Dockerfile `STOPSIGNAL SIGQUIT`; Nginx al recibir SIGQUIT realiza cierre ordenado (deja de aceptar conexiones nuevas, termina las en curso) |
-| **/trace** | No implementado en Nginx | No existe en `nginx/nginx.conf` ni en la configuración del contenedor |
+| **/trace** | No implementado en Nginx | No existe en `nginx/nginx.conf` ni en la configuración del contenedor. La trazabilidad de peticiones queda cubierta por los logs de acceso de Traefik (configuración externa a este repositorio) y por el `request_id` del access log JSON de Nginx (issue #13), de alcance limitado a peticiones de archivos estáticos (peticiones a `/api` no atraviesan este nginx tras la issue #2) |
 | **Métricas completas** | No implementado en Nginx | No hay contadores/objetivos de Prometheus expuestos en el front |
 | **/pause** | No implementado | No existe en la configuración del front |
 | **/resume** | No implementado | No existe en la configuración del front |
@@ -54,6 +54,23 @@ El microservicio front-end es la **excepción** para los endpoints `/shutdown`, 
 4. **Traefik ya provee métricas y tracing a nivel de infraestructura:** El router Traefik recopila `NetworkErrorRatio`, `ResponseCodeRatio`, y puede exportar métricas Prometheus. El health check de Traefik (`traefik.http.services.frontend.loadbalancer.healthcheck.path=/health`) ya verifica la disponibilidad del front.
 
 5. **El apagado seguro ya está resuelto por la señal SIGQUIT:** A diferencia de SIGTERM/SIGINT que provocan cierre rápido, SIGQUIT hace que Nginx termine conexiones en vuelo de manera ordenada. El `stop_grace_period: 10s` en `docker-compose.yml` da suficiente tiempo para este proceso.
+
+## Trazabilidad Sustituta (Issue #15)
+
+Cómo se cubre la trazabilidad de peticiones al no implementar `/trace` en el front-end, separando lo verificado de lo que depende de configuración externa:
+
+| Afirmación | Evidencia | Verificado |
+|---|---|---|
+| **a. Logs de acceso de Traefik** | Cuando Traefik tiene acceso log habilitado (configuración externa a este repositorio), registra por petición: método, ruta, estado, duración, router y servicio. **La configuración de Traefik no vive en este repositorio** (`docker-compose.yml` solo tiene labels del front-end, sin `accesslog` ni fields de requestID). Lo que se afirme sobre sus logs de acceso depende del despliegue de Traefik y no está verificado aquí. | Parcial ✔ (por diseño: archivo externo) |
+| **b. request_id del access log del front (issue #13)** | El access log JSON de Nginx (issue #13, `nginx/nginx.conf:13-22` y `40-generate-config.sh`) incluye un campo `request_id` por petición. **Alcance real**: identifica únicamente peticiones de archivos estáticos atendidas por este nginx (peticiones `GET /`, `GET /index.html`, `GET /config.js`, archivos CSS/JS/imágenes). **Alcance limitado**: peticiones a `/api/v1/...` no atraviesan este nginx — tras la issue #2 no hay `location /api/` ni `proxy_pass`, por lo que el request_id no correlaciona llamadas al backend. | Parcial ✔ (alcance comprobado: estáticos solo) |
+| **c. Correlación entre ambos** | Los logs de acceso de Traefik y de nginx se correlacionan por **ruta, marca temporal y estado HTTP**, pero **no por identificador de petición** único. No hay propagación de una cabecera de correlación común entre Traefik y nginx en la configuración actual. Para lograr correlación por request_id haría falta: (1) que el cliente envíe una cabecera `X-Request-ID` o similar, y (2) que nginx la reutilice en su log_format (ya usa `$request_id` en JSON pero solo para estáticos). Esta es una mejora propuesta SIN implementar. | No verificado ✘ |
+
+### Estado verificado resumido
+
+- /trace no está implementado en Nginx (ADR-001, línea 26, 34, 112)
+- Trazabilidad cubierta parcialmente: Traefik logs (externos) + request_id de nginx (solo estáticos)
+- No hay correlación por request_id entre Traefik y nginx sin configuración adicional
+- Llamadas a `/api` no pasan por este nginx (issue #2)
 
 ## Alternativas Consideradas
 
@@ -109,7 +126,7 @@ Esto se verificó en la issue #6: ambos tiempos de medición fueron ~0.6-0.7 seg
 | Característica | Estado en Front-end | Impacto |
 |---|---|---|
 | `/health` | ✅ Implementado (Nginx) | Cumple requisito de health check a nivel de servicio |
-| `/trace` | ❌ No implementado | La evaluación de trazas se debe hacer sobre el backend FastAPI |
+| `/trace` | ❌ No implementado | La evaluación de trazas se debe hacer sobre el backend FastAPI; la trazabilidad sustituta cubre: logs de acceso de Traefik (externos a este repo) y request_id del access log de Nginx (alcance: solo archivos estáticos, peticiones a `/api` no pasan por este nginx tras issue #2). No hay correlación por request_id sin configuración adicional |
 | **Métricas completas** | ❌ No implementado | No hay contadores/objetivos expuestos en el front; usar métricas de Traefik/Prometheus a nivel de infraestructura |
 | **/pause** | ❌ No implementado | No aplica para servidor de archivos estáticos |
 | **/resume** | ❌ No implementado | No aplica para servidor de archivos estáticos |
@@ -132,4 +149,5 @@ Esto se verificó en la issue #6: ambos tiempos de medición fueron ~0.6-0.7 seg
 - Issue #3: "Reglas routers Traefik con `!PathPrefix` y prioridad baja" — enruteo correcto de tráfico
 - Issue #5: "Sin `ports:` en el servicio front" — exposición solo mediante `expose: ["80"]`
 - Issue #6: "Verificación funcional con Docker" — incluye medición de `docker stop` tiempos
+- Issue #15: "Documentar /trace como excepción" — criterios de aceptación sobre excepción y trazabilidad sustituta
 - Especificaciones del trabajo: "cada microservicio tenga: logs configurables, trace, métricas, /health por capas, /shutdown /pause /resume"
