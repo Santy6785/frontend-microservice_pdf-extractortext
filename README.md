@@ -129,6 +129,30 @@ El contenedor inyecta las variables de entorno en runtime mediante `envsubst` a 
 
 ---
 
+## 4.5 Métricas internas (stub_status)
+
+El microservicio front-end expone métricas básicas de Nginx mediante `stub_status` en el puerto **8081** dentro del contenedor. Este puerto **no se publica** en el host (consistent con issue #5), por lo que solo otros contenedores de la red Docker pueden acceder a él.
+
+| Característica | Detalle |
+|---|---|
+| **Puerto** | 8081 (interno, no publicado) |
+| **Endpoints** | `GET /metrics` → resumen de `stub_status` en texto plano<br>`GET /` → 404 |
+| **Formato** | Texto plano (no es formato Prometheus)<br>Contiene: `Active connections`, `server accepts handled requests`, `Reading/Writing/Waiting` |
+| **Acceso** | Solo desde contenedores de la red `pdf-extractortext_pdf-network`<br>Ejemplo: `curl http://pdf-frontend:8081/metrics` |
+| **Restricciones** | `access_log off` en este server block<br>No enrutado por Traefik (solo puerto 80)<br>El campo usa `$uri` (NUNCA `$request_uri`) |
+
+*Salida de ejemplo de `curl http://pdf-frontend:8081/metrics`:*
+
+```
+Active connections: 1
+  server accepts handled requests: 10 10 10
+  Reading: 0 Writing: 1 Waiting: 0
+```
+
+*Nota:* Si se requiere formato Prometheus en el futuro, se debe añadir un exportador separado. Las métricas de `stub_status` son de uso interno para diagnóstico y monitoreo básico de la infraestructura Docker.
+
+---
+
 ## 5. Pruebas y Control de Calidad
 
 El proyecto utiliza el test runner nativo de Node.js (`node --test`), sin dependencias pesadas de terceros:
