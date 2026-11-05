@@ -125,6 +125,28 @@ Para ejecutar linting, todas las pruebas y construir la imagen Docker en un solo
 
 ## 6. Contrato de API y OpenAPI Snapshot
 
+> **[!IMPORTANTE]**
+> Se ha añadido una Política de Seguridad de Contenidos (CSP) en la cabecera HTTP `Content-Security-Policy` mediante configuración en `nginx/nginx.conf`. La política es:
+
+> ```
+> default-src 'self';
+> script-src 'self' https://cdn.tailwindcss.com;
+> style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+> font-src 'self' https://fonts.gstatic.com;
+> img-src 'self' data:;
+> connect-src 'self';
+> ```
+
+> **Justificación:** Defensa en profundidad al ser el front-end un sitio estático servido por Nginx sin ejecución de PHP u otros runtimes. Los scripts y estilos provienen de orígenes confiables (`self`, CDN de Tailwind, Google Fonts). No se usa `'unsafe-eval'`. La directiva `'unsafe-inline'` en `style-src` es necesaria para los estilos inline del HTML (ver `frontend/index.html`); no hay `'unsafe-inline'` en `script-src`.
+
+> **Rutas afectadas:** La cabecera CSP aparece en todas las respuestas de Nginx: `/`, `/index.html`, `/config.js`, `/health`, archivos estáticos y respuestas 404 (por la directiva `always` en `add_header`).
+
+> **Cómo ajustarla:** Si se añaden nuevos recursos al front (scripts, estilos, fuentes), modificar la cadena de la CSP en `nginx/nginx.conf`. Para sustituir `'unsafe-inline'` en `style-src` por un hash `sha384`, se debe extraer el contenido del `<style>` inline a un archivo `.css` propio y añadir `sha384-<hash>` a la directiva `style-src`. No se han añadido orígenes de terceros no utilizados.
+
+---
+
+## 6. Contrato de API y OpenAPI Snapshot
+
 > [!NOTE]
 > Los archivos [`docs/api-contract.md`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/docs/api-contract.md) y [`docs/openapi.json`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/docs/openapi.json) incluidos en este repositorio son **snapshots** sincronizados para soporte del desarrollo, pruebas de integración con mocks y documentación técnica del equipo front-end.
 > 
