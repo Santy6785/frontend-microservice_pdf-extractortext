@@ -41,4 +41,24 @@ describe('Contract: openapi.json exists and has expected routes', () => {
       }
     });
   });
+
+  it('GET /api/v1/documents/ retorna array de DocumentListDTO segun contrato final (O-10 / D2)', () => {
+    const raw = readFileSync('docs/openapi.json', 'utf8');
+    const openapi = JSON.parse(raw);
+    const getOp = openapi.paths['/api/v1/documents/']?.get;
+    if (!getOp) throw new Error('Falta GET /api/v1/documents/ en openapi.json');
+
+    const responseSchema = getOp.responses?.['200']?.content?.['application/json']?.schema;
+    if (responseSchema?.type !== 'array' || responseSchema?.items?.$ref !== '#/components/schemas/DocumentListDTO') {
+      throw new Error('GET /api/v1/documents/ debe retornar array de DocumentListDTO');
+    }
+
+    const dto = openapi.components?.schemas?.DocumentListDTO;
+    const props = Object.keys(dto?.properties || {});
+    for (const field of ['id', 'checksum', 'created_at']) {
+      if (!props.includes(field)) {
+        throw new Error(`DocumentListDTO debe incluir el campo ${field}`);
+      }
+    }
+  });
 });
