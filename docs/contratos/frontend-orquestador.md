@@ -28,7 +28,7 @@ El front accede a todos los endpoints bajo el prefijo `/api/v1` a través de Tra
 | 409 | `Ya existe un documento con el mismo checksum` (duplicado) |
 | 422 | `No se pudo procesar el PDF: <mensaje_error>` (PDF corrupto/protegido) o errores de validación Pydantic |
 | **Efectos colaterales** | - Se calcula checksum SHA-256 en el cliente<br>- El front muestra mensajes traducidos: "El archivo ya existe en el sistema.", "El archivo no es un PDF válido o está corrupto.", etc.<br>- Si el checksum ya existe, el flujo E2E es: Upload → 409 Duplicate → Delete → nuevo Upload |
-| **Aspectos no funcionales** | - Timeouts configurables vía `REQUEST_TIMEOUT_MS` (default: 30000 ms)<br>- Tamaño máximo configurable vía `MAX_UPLOAD_MB` (default: 10 MB)<br>- **SIN reintento automático** para POST (idempotencia no aplicable) |
+| **Aspectos no funcionales** | - Timeouts configurables vía `REQUEST_TIMEOUT_MS` (default: 45000 ms)<br>- Tamaño máximo configurable vía `MAX_UPLOAD_MB` (default: 10 MB)<br>- **SIN reintento automático** para POST (idempotencia no aplicable) |
 
 ---
 

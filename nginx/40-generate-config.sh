@@ -12,7 +12,7 @@ nginx -t > /dev/null 2>&1 || {
 # Asignar valores por defecto a variables de entorno si no existen
 export API_BASE_PATH="${API_BASE_PATH:-}"
 export MAX_UPLOAD_MB="${MAX_UPLOAD_MB:-10}"
-export REQUEST_TIMEOUT_MS="${REQUEST_TIMEOUT_MS:-30000}"
+export REQUEST_TIMEOUT_MS="${REQUEST_TIMEOUT_MS:-45000}"
 
 # --- NUEVO: Leer y validar LOG_LEVEL y ACCESS_LOG ---
 
