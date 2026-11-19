@@ -9,8 +9,13 @@
     "test:integration": "node --test tests/frontend/integration/*.test.js",
     "test:system": "node --test tests/frontend/system/*.test.js",
     "test": "node --test tests/frontend/**/*.test.js",
-  "test:contract": "node --test tests/contract/contract.test.js"
+    "test:contract": "node --test tests/contract/contract.test.js",
+    "test:e2e": "node --test tests/e2e/e2e.full-flow.test.js"
   },
-  "keywords": ["frontend", "pdf", "microservice"],
+  "keywords": [
+    "frontend",
+    "pdf",
+    "microservice"
+  ],
   "license": "MIT"
 }
