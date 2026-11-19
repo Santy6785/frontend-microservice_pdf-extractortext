@@ -23,7 +23,7 @@ COPY frontend/ /usr/share/nginx/html/
 
 # Ajustar permisos para permitir ejecución segura con usuario sin privilegios
 RUN touch /tmp/nginx.pid && \
-    chown -R nginx:nginx /tmp/nginx.pid /var/cache/nginx /var/run /usr/share/nginx/html
+    chown -R nginx:nginx /tmp/nginx.pid /var/cache/nginx /var/run /usr/share/nginx/html /etc/nginx/log_error.conf /etc/nginx/log_access.conf
 
 # Exponer el puerto HTTP
 EXPOSE 80
