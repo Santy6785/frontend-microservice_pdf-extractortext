@@ -171,7 +171,7 @@ Leyenda:
    - Nginx ejecuta `/docker-entrypoint.d/40-generate-config.sh` que genera `/usr/share/nginx/html/config.js` a partir de `config.template.js` usando variables de entorno:
      - `API_BASE_PATH` (default: `""` para rutas relativas `/api/v1/...`).
      - `MAX_UPLOAD_MB` (default: `10`).
-     - `REQUEST_TIMEOUT_MS` (default: `30000`).
+     - `REQUEST_TIMEOUT_MS` (default: `45000`).
 3. **Observabilidad del Microservicio Front:**
    - La especificación de microservicios prevé `/health`, `/trace`, métricas y `/pause|/resume|/shutdown`. En el backend FastAPI están resueltas; en el microservicio de front-end estático (Nginx), se implementa un endpoint `/health` estático de alta eficiencia que retorna `200 OK` con JSON `{"status":"ok","service":"frontend"}`. Las trazas y métricas se manejan en Traefik y backend. El apagado seguro se gestiona mediante la señal `SIGQUIT` en Nginx con `stop_grace_period: 10s`.
 4. **Logs JSON Estructurados:**

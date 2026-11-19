@@ -12,7 +12,7 @@
 - Sistema operativo: Windows 10/11
 
 ## Versiones relevantes
-- `REQUEST_TIMEOUT_MS`: 30000 (30 s) — valor por defecto en todo el stack
+- `REQUEST_TIMEOUT_MS`: 45000 (45 s) (actualizado por Decisión D8 / F-02; anteriormente 30000) — valor por defecto en todo el stack
 - `MAX_UPLOAD_MB`: 10 — valor por defecto en todo el stack
 - validator.js calcula `maxSizeBytes = maxUploadMb * 1024 * 1024` (1 MB = 1.048.576 bytes)
 
@@ -79,8 +79,8 @@ El documento está enlazado desde el README en la sección de configuración REQ
 |---|---|
 | Criterio 1 (medir PDF ~9 MB) | **NO VERIFICADO** — sin backend real accessible |
 | Criterio 2 (¿supera 25 s?) | No aplicable (sin datos medidos) |
-| Timeout actual | Se mantiene en **30000 ms (30 s)** |
-| Justificación | Sin medición real, no procede ajuste según la issue |
+| Timeout actual | Actualizado a **45000 ms (45 s)** (Decisión D8 / Issue #38) |
+| Justificación | Elevado a 45 s por Decisión D8 (F-02) para igualar la llamada más larga del orquestador y evitar cortes prematuros a los 30 s |
 
 ## Comandos de reproducción (para cuándo haya backend disponible)
 Si en el futuro hay un backend real accesible, el procedimiento de medición sería:

@@ -18,7 +18,7 @@ const runtimeConfig = window.__CONFIG__ || {};
 const config = {
   apiBasePath: runtimeConfig.API_BASE_PATH ?? '',
   maxUploadMb: Number(runtimeConfig.MAX_UPLOAD_MB) || 10,
-  requestTimeoutMs: Number(runtimeConfig.REQUEST_TIMEOUT_MS) || 30000
+  requestTimeoutMs: Number(runtimeConfig.REQUEST_TIMEOUT_MS) || 45000
 };
 
 const apiClient = new ApiClient({
