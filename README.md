@@ -168,6 +168,7 @@ npm test
 npm run test:unit           # Pruebas unitarias (state, validator, controller, api-client)
 npm run test:integration    # Integración MVC contra servidor mock OpenAPI
 npm run test:system         # Simulación de flujo E2E en navegador
+npm run test:e2e            # Prueba E2E real contra https://universidad.localhost (requiere stack completo levantado)
 ```
 
 ### Script de Build y Validación Completa
