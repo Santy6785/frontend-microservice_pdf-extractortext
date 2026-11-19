@@ -8,7 +8,6 @@ const ENDPOINTS = [
   { method: 'GET',    path: '/health',                    desc: 'Health check del front' },
   { method: 'GET',    path: '/api/v1/documents/',       desc: 'Listado paginado de documentos' },
   { method: 'GET',    path: '/api/v1/documents/:id',    desc: 'Obtener documento por ID' },
-  { method: 'PUT',    path: '/api/v1/documents/:id',    desc: 'Actualizar texto extraído' },
   { method: 'DELETE', path: '/api/v1/documents/:id',    desc: 'Eliminar documento' },
   { method: 'POST',   path: '/api/v1/documents/upload', desc: 'Subir y procesar PDF' },
 ];

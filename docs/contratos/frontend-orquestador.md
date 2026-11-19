@@ -61,22 +61,8 @@ El front accede a todos los endpoints bajo el prefijo `/api/v1` a través de Tra
 
 ---
 
-### 1.4. PUT /api/v1/documents/{id} (Actualizar texto extraído)
 
-| Campo | Descripción |
-|---|---|
-| **Método** | PUT |
-| **Ruta** | /api/v1/documents/{id} |
-| **Content-Type** | `application/json` |
-| **Cuerpo JSON** | - `extracted_text` (string, obligatorio): texto extraído a actualizar |
-| **Idempotente** | **NUNCA** automática (`allowRetry: false`) |
-| **Éxito (200)** | **Cuerpo:** `DocumentResponseDTO` con el texto actualizado |
-| **Errores** | - 404: `{"detail": "Documento con id <id> no encontrado"}`<br>- 422: Si falta `extracted_text` o el tipo no es string |
-| **Aspectos no funcionales** | - El front actualiza el texto en la UI después de procesar un PDF |
-
----
-
-### 1.5. DELETE /api/v1/documents/{id} (Eliminar documento)
+### 1.4. DELETE /api/v1/documents/{id} (Eliminar documento)
 
 | Campo | Descripción |
 |---|---|
@@ -89,7 +75,7 @@ El front accede a todos los endpoints bajo el prefijo `/api/v1` a través de Tra
 
 ---
 
-### 1.6. GET /health (Health check del front/proxy)
+### 1.5. GET /health (Health check del front/proxy)
 
 | Campo | Descripción |
 |---|---|

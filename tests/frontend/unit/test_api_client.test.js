@@ -265,7 +265,7 @@ describe('ApiClient Unit Tests', () => {
     });
 
     await assert.rejects(
-      async () => client.updateDocument('doc-123', null),
+      async () => client.uploadDocument(new File(['%PDF'], 'doc.pdf', { type: 'application/pdf' })),
       (err) => {
         assert.equal(err.status, 422);
         assert.ok(err.message.includes('Field required') || err.message.includes('extracted_text'));
