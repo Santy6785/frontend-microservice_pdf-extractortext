@@ -163,7 +163,7 @@ Leyenda:
 ## 4. Decisiones Técnicas y DevOps
 
 1. **Separación MVC en JavaScript Moderno:**
-   - **`api-client.js` (Model / Network Layer):** Único punto de contacto HTTP. Soporta `uploadDocument`, `listDocuments`, `getDocument`, `updateDocument`, `deleteDocument`, `checkHealth`. Implementa timeouts con `AbortController`, backoff exponencial en peticiones `GET`, parseo defensivo y normalización de errores.
+   - **`api-client.js` (Model / Network Layer):** Único punto de contacto HTTP. Soporta `uploadDocument`, `listDocuments`, `getDocument`, `deleteDocument`, `checkHealth`. Implementa timeouts con `AbortController`, backoff exponencial en peticiones `GET`, parseo defensivo y normalización de errores.
    - **`state.js` (Model / State):** Contenedor observable de estado reactivo.
    - **`view.js` (View Layer):** Manipulación exclusiva del DOM, renderizado de badges, actualización de textos literales y animaciones.
    - **`controller.js` (Controller Layer):** Orquestación de eventos y casos de uso.

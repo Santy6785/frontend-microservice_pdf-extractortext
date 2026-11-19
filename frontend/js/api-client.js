@@ -245,19 +245,6 @@ export class ApiClient {
     });
   }
 
-  /**
-   * Actualizar el texto extraído de un documento existente.
-   * Endpoint: PUT /api/v1/documents/{id}
-   * No se reintenta automáticamente.
-   */
-  async updateDocument(id, extractedText) {
-    if (!id) throw new ApiError('El identificador de documento es requerido', 400);
-    return this._request('PUT', `/api/v1/documents/${encodeURIComponent(id)}`, {
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ extracted_text: extractedText }),
-      allowRetry: false
-    });
-  }
 
   /**
    * Eliminar un documento por su ID.
