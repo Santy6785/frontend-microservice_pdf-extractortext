@@ -118,6 +118,25 @@ docker build -t pdf-frontend:0.2.0 -t pdf-frontend:latest .
 docker run -d --name pdf-frontend --network pdf-extractortext_pdf-network pdf-frontend:0.2.0
 ```
 
+
+### 3.2 Orden de Arranque del Sistema Completo
+
+Al desplegar la plataforma completa de microservicios sobre la red compartida `pdf-extractortext_pdf-network` (junto con el reverse proxy **Traefik**), los servicios deben iniciarse de forma escalonada de abajo hacia arriba según sus dependencias funcionales:
+
+```text
+1. Persistencia  →  2. Extractor  →  3. Orquestador  →  4. Front-End
+```
+
+| Orden | Microservicio / Capa | Rol y Dependencia | Verificación antes de continuar |
+|---:|---|---|---|
+| **1** | **Persistencia** | Base de datos y almacenamiento del sistema; crea/inicializa la red Docker compartida (`pdf-extractortext_pdf-network`) si aún no existe. | Contenedor saludable (`healthy`) y listo para aceptar conexiones. |
+| **2** | **Extractor** | Servicio de extracción de texto desde archivos PDF; depende de la capa de persistencia. | Servicio levantado y pasando su health check interno. |
+| **3** | **Orquestador** | API REST (`orquestador`, puerto interno `8000`) que coordina validación, extracción y persistencia, y registra su router `/api` en Traefik. | `GET http://orquestador:8000/api/v1/health` (o `https://universidad.localhost/api/v1/health`) responde `200 OK`. |
+| **4** | **Front-End** | Interfaz web estática en Nginx (`frontend` / `pdf-frontend`, puerto interno `80`) que consume `/api/v1/...` a través de Traefik. | `GET http://pdf-frontend/health` (o `https://universidad.localhost/health`) responde `{"status":"ok","service":"frontend"}`. |
+
+> [!TIP]
+> **Nota de resiliencia en el arranque:** Si el **Front-End** se inicia antes de que el **Orquestador** esté disponible, la interfaz web carga con normalidad pero las operaciones de subida o consulta de documentos devolverán errores transitorios de proxy (`502`/`503`) hasta que el orquestador complete su inicialización.
+
 ---
 
 ## 4. Configuración en Runtime
