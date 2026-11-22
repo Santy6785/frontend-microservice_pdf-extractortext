@@ -1,4 +1,5 @@
-import { describe, it, assert } from 'node:test';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 const ORCHESTRATOR_BASE_URL = process.env.ORCHESTRATOR_BASE_URL;
 
 describe('Contract: live checks against real orchestrator', () => {
@@ -70,7 +71,7 @@ describe('Contract: live checks against real orchestrator', () => {
 
     const uploadUrl = new URL(`${ORCHESTRATOR_BASE_URL}/api/v1/documents/upload`, ORCHESTRATOR_BASE_URL);
     const uploadRes = await fetch(uploadUrl, { method: 'POST', body: formData });
-    expect([200, 201]).toContain(uploadRes.status);
+    assert([200, 201].includes(uploadRes.status), `Expected 200/201, got ${uploadRes.status}`);
     const uploadJson = await uploadRes.json();
     const docId = uploadJson.id;
 

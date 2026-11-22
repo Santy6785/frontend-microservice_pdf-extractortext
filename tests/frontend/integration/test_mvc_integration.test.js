@@ -173,22 +173,65 @@ describe('MVC Integration Tests (Controller + ApiClient vs OpenAPI Mock Server)'
     );
   });
 
-  test('Escenario 7: Listado paginado retorna coleccion de DocumentListDTO', async () => {
+  test('Escenario 7: Listado paginado reproduce contrato final de DocumentListDTO[] (O-10 / D2)', async () => {
     const listData = [
-      { id: '1', checksum: 'hash1', created_at: '2026-04-27T10:00:00Z' },
-      { id: '2', checksum: 'hash2', created_at: '2026-04-27T11:00:00Z' }
+      { id: '662d1a000000000000000001', checksum: 'a'.repeat(64), created_at: '2026-04-27T10:00:00Z' },
+      { id: '662d1a000000000000000002', checksum: 'b'.repeat(64), created_at: '2026-04-27T11:00:00Z' }
     ];
 
     mockRoutes['GET /api/v1/documents/'] = (req, res, url) => {
-      assert.equal(url.searchParams.get('skip'), '0');
-      assert.equal(url.searchParams.get('limit'), '10');
+      const skip = Number(url.searchParams.get('skip'));
+      const limit = Number(url.searchParams.get('limit'));
+
+      if (skip < 0 || limit < 1 || limit > 100) {
+        res.writeHead(422, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          detail: [
+            {
+              loc: ['query', skip < 0 ? 'skip' : 'limit'],
+              msg: 'Input should be greater than or equal to 0',
+              type: 'greater_than_equal'
+            }
+          ]
+        }));
+        return;
+      }
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(listData));
+      if (skip >= listData.length) {
+        res.end(JSON.stringify([]));
+        return;
+      }
+      res.end(JSON.stringify(listData.slice(skip, skip + limit)));
     };
 
     const { apiClient } = setupController();
-    const docs = await apiClient.listDocuments({ skip: 0, limit: 10 });
-    assert.deepEqual(docs, listData);
+
+    // 1. Llamada con defaults (skip=0, limit=20) retorna array plano de DocumentListDTO
+    const defaultDocs = await apiClient.listDocuments();
+    assert.equal(Array.isArray(defaultDocs), true);
+    assert.deepEqual(defaultDocs, listData);
+    for (const item of defaultDocs) {
+      assert.equal(typeof item.id, 'string');
+      assert.equal(typeof item.checksum, 'string');
+      assert.equal(typeof item.created_at, 'string');
+    }
+
+    // 2. Paginacion con skip y limit
+    const pagedDocs = await apiClient.listDocuments({ skip: 1, limit: 1 });
+    assert.equal(Array.isArray(pagedDocs), true);
+    assert.deepEqual(pagedDocs, [listData[1]]);
+
+    // 3. Offset sin resultados retorna array vacio []
+    const emptyDocs = await apiClient.listDocuments({ skip: 10, limit: 20 });
+    assert.equal(Array.isArray(emptyDocs), true);
+    assert.deepEqual(emptyDocs, []);
+
+    // 4. Parametros invalidos (422 Pydantic validation list)
+    await assert.rejects(
+      () => apiClient.listDocuments({ skip: -1, limit: 0 }),
+      (err) => err.status === 422 && Array.isArray(err.detail?.detail)
+    );
   });
 
   test('Escenario 8: 502/503/504 devuelto por proxy Traefik/Nginx', async () => {
