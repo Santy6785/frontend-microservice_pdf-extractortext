@@ -94,6 +94,23 @@ Para garantizar la coexistencia sin colisiones en el dominio compartido `univers
 
 Para el snippet completo y detalles de configuración, consulte [`docs/traefik-routing.md`](docs/traefik-routing.md).
 
+### 3.1 URLs Internas y Puertos (Microservicio y Dependencias)
+
+Todos los componentes se comunican dentro de la red externa compartida de Docker `pdf-extractortext_pdf-network` (configurable mediante `DOCKER_NETWORK_NAME`). Ningún contenedor publica puertos directamente al host; el acceso externo entra únicamente por **Traefik** (`https://universidad.localhost`).
+
+| Componente / Rol | Servicio / Contenedor | Puerto Interno | URL Interna (Red Docker) | URL Externa (vía Traefik) | Propósito |
+|---|---|---:|---|---|---|
+| **Front-End (UI)** | `frontend` (`pdf-frontend`) | `80` | `http://pdf-frontend:80`<br>`http://pdf-frontend/health` | `https://universidad.localhost/`<br>`https://universidad.localhost/health` | Aplicación web estática (Nginx) y health check |
+| **Front-End (Métricas)** | `frontend` (`pdf-frontend`) | `8081` | `http://pdf-frontend:8081/metrics` | *No expuesto externamente* | Métricas internas `stub_status` de Nginx (solo red Docker) |
+| **Orquestador / Backend** *(dependencia)* | `orquestador` | `8000` | `http://orquestador:8000`<br>`http://orquestador:8000/api/v1/health` | `https://universidad.localhost/api/v1/...` | API REST de gestión y extracción de PDFs (`priority=20`, sin `StripPrefix`) |
+| **Reverse Proxy** *(infraestructura)* | `traefik` | `443` (entrypoint `https`) | Red interna `pdf-extractortext_pdf-network` | `https://universidad.localhost` | Terminación TLS, balanceo, health checks y middlewares (`retry`, `circuitbreaker`) |
+
+#### Detalle de consumo entre Front-End y Dependencias
+
+- **Comunicación desde el navegador (mismo origen):** Por defecto (`API_BASE_PATH=""`), `ApiClient` utiliza rutas relativas (`/api/v1/documents/upload`, `/api/v1/documents/?skip=0&limit=20`, `/api/v1/documents/{id}`), por lo que el navegador envía las solicitudes a `https://universidad.localhost/api/v1/...` y **Traefik** las redirige internamente a `http://orquestador:8000`.
+- **Comunicación interna de diagnóstico:** Dentro del propio contenedor del front-end, el `HEALTHCHECK` de Docker consulta `http://127.0.0.1/health` (puerto `80`), mientras que otros contenedores en `pdf-extractortext_pdf-network` pueden consultar `http://pdf-frontend:80/health` y `http://pdf-frontend:8081/metrics`.
+- **Aislamiento de dependencias aguas abajo:** El microservicio Front-End no se comunica directamente con el extractor ni con la base de datos; toda interacción de negocio pasa exclusivamente por el **Orquestador** (`/api/v1/...`).
+
 ### Opción B: Construcción directa con Docker
 
 ```bash
@@ -189,7 +206,7 @@ Para obtener el detalle completo de la excepción del front-end en endpoints ope
 
 ---
 
-## 6. Contrato de API y OpenAPI Snapshot
+## 7. Política de Seguridad de Contenidos (CSP)
 
 > **[!IMPORTANTE]**
 > Se ha añadido una Política de Seguridad de Contenidos (CSP) en la cabecera HTTP `Content-Security-Policy` mediante configuración en `nginx/nginx.conf`. La política es:
@@ -211,7 +228,7 @@ Para obtener el detalle completo de la excepción del front-end en endpoints ope
 
 ---
 
-## 6. Contrato de API y OpenAPI Snapshot
+## 8. Contrato de API y OpenAPI Snapshot
 
 > [!NOTE]
 > Los archivos [`docs/api-contract.md`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/docs/api-contract.md) y [`docs/openapi.json`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/docs/openapi.json) incluidos en este repositorio son **snapshots** sincronizados para soporte del desarrollo, pruebas de integración con mocks y documentación técnica del equipo front-end.
@@ -221,6 +238,6 @@ Para obtener el detalle completo de la excepción del front-end en endpoints ope
 
 ---
 
-## 7. Licencia
+## 9. Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [`LICENSE`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/LICENSE) para más detalles.
