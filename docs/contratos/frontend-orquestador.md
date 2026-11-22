@@ -176,17 +176,3 @@ npm run test:contract
 ⚠️ **Riesgo:** Esta variable afecta a todo el proceso Node.js en curso; usarla solo para el comando de prueba y en entornos de desarrollo/test.
 
 ---
-
-### Línea de enlace en el README
-
-Añadir en el README (sección de documentación o API):
-
-> **[Contrato de consumidor front-end](contratos/frontend-orquestador.md)**: documento con el contrato de los endpoints consumidos por el microservicio front-end (`POST /api/v1/documents/upload`, `GET /api/v1/documents/?skip=&limit=`, etc.), códigos de error, garantías y cambios que romperían la compatibilidad. Complementa a `docs/api-contract.md` y `docs/openapi.json`.
-
---- 
-
-Ahora voy a añadir el enlace en el README.</think>Voy a añadir el enlace en el README.
-<tool_call>
-<function=edit>
-<parameter=filePath>
-C:\Users\jerek\Desktop\Facultad\3ro\Desarrollo de Software\repo\frontend-microservice_pdf-extractortext\README.md
