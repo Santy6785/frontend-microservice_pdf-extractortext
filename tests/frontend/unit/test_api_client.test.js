@@ -290,3 +290,13 @@ describe('ApiClient Unit Tests', () => {
     assert.deepEqual(health, { status: 'ok', service: 'frontend' });
   });
 });
+
+test('usa 45000 ms como timeout por defecto en ApiClient y config', async () => {
+  const defaultClient = new ApiClient();
+  assert.equal(defaultClient.timeoutMs, 45000);
+
+  const configRaw = await import('node:fs').then(fsMod => fsMod.readFileSync('frontend/config.js', 'utf8'));
+  const templateRaw = await import('node:fs').then(fsMod => fsMod.readFileSync('frontend/config.template.js', 'utf8'));
+  assert.match(configRaw, /REQUEST_TIMEOUT_MS:\s*45000/);
+  assert.match(templateRaw, /REQUEST_TIMEOUT_MS:.*45000/);
+});

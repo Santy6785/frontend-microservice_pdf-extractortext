@@ -111,7 +111,7 @@ El contenedor inyecta las variables de entorno en runtime mediante `envsubst` a 
 |---|---|---|
 | `API_BASE_PATH` | Prefijo o URL base de la API backend | `""` (Ruta relativa de mismo origen) |
 | `MAX_UPLOAD_MB` | Tamaño máximo permitido de PDF en MB | `10` |
-| `REQUEST_TIMEOUT_MS` | Timeout global para peticiones HTTP | `30000` (30 segundos) |
+| `REQUEST_TIMEOUT_MS` | Timeout global para peticiones HTTP | `45000` (45 segundos) |
 | `LOG_LEVEL` | Nivel de log de error de Nginx | `info` |
 | `ACCESS_LOG` | Activar logs de acceso en JSON a stdout | `on` |
 

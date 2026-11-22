@@ -4,7 +4,7 @@ set -e
 # Valores por defecto
 export API_BASE_PATH="${API_BASE_PATH:-}"
 export MAX_UPLOAD_MB="${MAX_UPLOAD_MB:-10}"
-export REQUEST_TIMEOUT_MS="${REQUEST_TIMEOUT_MS:-30000}"
+export REQUEST_TIMEOUT_MS="${REQUEST_TIMEOUT_MS:-45000}"
 export LOG_LEVEL="${LOG_LEVEL:-info}"
 export ACCESS_LOG="${ACCESS_LOG:-on}"
 

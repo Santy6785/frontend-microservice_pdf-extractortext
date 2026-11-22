@@ -18,13 +18,13 @@ export class ApiClient {
   /**
    * @param {Object} options
    * @param {string} [options.basePath=''] URL base o prefijo de ruta (e.g. "" para rutas relativas)
-   * @param {number} [options.timeoutMs=30000] Tiempo límite de petición en milisegundos
+   * @param {number} [options.timeoutMs=45000] Tiempo límite de petición en milisegundos
    * @param {number} [options.maxRetries=3] Máximo de reintentos para peticiones idempotentes
    * @param {number} [options.retryBaseDelayMs=300] Demora base en ms para backoff exponencial
    */
   constructor(options = {}) {
     this.basePath = (options.basePath || '').replace(/\/+$/, '');
-    this.timeoutMs = options.timeoutMs ?? 30000;
+    this.timeoutMs = options.timeoutMs ?? 45000;
     this.maxRetries = options.maxRetries ?? 3;
     this.retryBaseDelayMs = options.retryBaseDelayMs ?? 300;
   }
