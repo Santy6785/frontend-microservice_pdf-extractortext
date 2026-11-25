@@ -105,7 +105,7 @@ export class AppView {
 
   downloadText(filename, content) {
     if (!content) return;
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = this.doc.createElement('a');
     a.href = url;
@@ -113,6 +113,8 @@ export class AppView {
     this.doc.body.appendChild(a);
     a.click();
     this.doc.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Revocar la URL tras un breve delay para permitir que el navegador
+    // inicie la descarga del Blob antes de liberar la URL temporal.
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 }

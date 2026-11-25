@@ -196,7 +196,7 @@ export class AppController {
   }
 
   /**
-   * Descarga el texto extraído en formato .txt
+   * Descarga el texto extraído en formato .md (Markdown)
    */
   downloadText() {
     const text = this.state.extractedText;
@@ -205,7 +205,7 @@ export class AppController {
     const baseName = this.state.selectedFile
       ? this.state.selectedFile.name.replace(/\.pdf$/i, '')
       : 'documento';
-    const filename = `${baseName}.txt`;
+    const filename = `${baseName}.md`;
 
     this.view.downloadText(filename, text);
   }

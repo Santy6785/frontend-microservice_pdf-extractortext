@@ -8,8 +8,10 @@ describe('AppController Unit Tests', () => {
   let state;
   let mockApiClient;
   let mockView;
+  let downloadTextArgs;
 
   beforeEach(() => {
+    downloadTextArgs = null;
     state = new AppState();
     mockApiClient = {
       uploadDocument: async () => {},
@@ -26,7 +28,7 @@ describe('AppController Unit Tests', () => {
       showResults: () => {},
       hideResults: () => {},
       showCopyFeedback: () => {},
-      downloadText: () => {}
+      downloadText: (filename, text) => { downloadTextArgs = { filename, text }; }
     };
     controller = new AppController({
       apiClient: mockApiClient,
@@ -113,5 +115,58 @@ describe('AppController Unit Tests', () => {
     assert.equal(deletedId, 'doc-777');
     assert.equal(state.documentId, null);
     assert.equal(state.hasResults, false);
+  });
+
+  test('downloadText invoca view.downloadText con nombre .md y texto extraído', () => {
+    state.setFile({ name: 'informe.pdf', type: 'application/pdf', size: 1024 });
+    state.setResults({
+      id: 'doc-1',
+      checksum: 'abc',
+      extractedText: '# Hola mundo\n\nTexto en Markdown.',
+    });
+
+    controller.downloadText();
+
+    assert.ok(downloadTextArgs, 'view.downloadText debe ser invocado');
+    assert.equal(downloadTextArgs.filename, 'informe.md', 'El archivo debe tener extension .md');
+    assert.equal(downloadTextArgs.text, '# Hola mundo\n\nTexto en Markdown.');
+  });
+
+  test('downloadText usa nombre documento.md cuando no hay archivo seleccionado', () => {
+    state.setResults({ id: 'doc-1', checksum: 'abc', extractedText: '# Texto' });
+    state.selectedFile = null;
+
+    controller.downloadText();
+
+    assert.equal(downloadTextArgs.filename, 'documento.md');
+  });
+
+  test('downloadText no invoca view.downloadText cuando no hay texto extraído', () => {
+    state.setFile({ name: 'informe.pdf', type: 'application/pdf', size: 1024 });
+    // extractedText queda vacio ('')
+    downloadTextArgs = null;
+
+    controller.downloadText();
+
+    assert.equal(downloadTextArgs, null, 'No debe invocar view.downloadText si no hay texto');
+  });
+
+  test('downloadText reemplaza extension .pdf por .md en el nombre', () => {
+    state.setFile({ name: 'reporte_final.pdf', type: 'application/pdf', size: 2048 });
+    state.setResults({ id: 'doc-2', checksum: 'xyz', extractedText: '# Reporte' });
+
+    controller.downloadText();
+
+    assert.equal(downloadTextArgs.filename, 'reporte_final.md');
+  });
+
+  test('downloadText no agrega .md dos veces si el nombre ya lo tiene', () => {
+    // El replace(/\.pdf$/i, '') solo quita .pdf, nunca agrega .md dos veces
+    state.setFile({ name: 'archivo.pdf', type: 'application/pdf', size: 500 });
+    state.setResults({ id: 'doc-3', checksum: 'zzz', extractedText: '# Archivo' });
+
+    controller.downloadText();
+
+    assert.equal(downloadTextArgs.filename, 'archivo.md');
   });
 });
