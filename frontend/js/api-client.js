@@ -265,4 +265,23 @@ export class ApiClient {
   async checkHealth() {
     return this._request('GET', '/health', { allowRetry: true });
   }
+
+  /**
+   * Descarga el texto extraído de un documento como archivo Markdown.
+   * Endpoint: GET /api/v1/documents/{id}/download
+   * Devuelve un Blob con el contenido del archivo.
+   */
+  async downloadDocument(id) {
+    if (!id) throw new ApiError('El identificador de documento es requerido', 400);
+    const url = this._buildUrl(`/api/v1/documents/${encodeURIComponent(id)}/download`);
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      const parsedBody = await this._parseResponseBody(response);
+      const errorMessage = this._normalizeErrorMessage(response.status, parsedBody);
+      throw new ApiError(errorMessage, response.status, parsedBody);
+    }
+    return await response.blob();
+  }
 }

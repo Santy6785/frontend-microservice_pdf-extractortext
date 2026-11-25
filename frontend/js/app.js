@@ -35,6 +35,16 @@ const controller = new AppController({
   config
 });
 
+// Event listeners para botones (reemplaza onclick inline por CSP)
+const clearFileBtn = document.getElementById('clearFileBtn');
+if (clearFileBtn) clearFileBtn.addEventListener('click', () => controller.clearFile());
+
+const deleteBtnEl = document.getElementById('deleteBtn');
+if (deleteBtnEl) deleteBtnEl.addEventListener('click', () => controller.deleteCurrentDocument());
+
+const downloadBtnEl = document.getElementById('downloadBtn');
+if (downloadBtnEl) downloadBtnEl.addEventListener('click', () => controller.downloadText());
+
 // Funciones globales para retrocompatibilidad con los atributos inline del HTML original
 window.appController = controller;
 window.handleFileSelect = (event) => {

@@ -196,17 +196,45 @@ export class AppController {
   }
 
   /**
-   * Descarga el texto extraído en formato .md (Markdown)
+   * Descarga el texto extraído de un documento como archivo .md.
+   * Intenta primero obtener el archivo desde el endpoint de descarga del
+   * orquestador; si falla (por ejemplo, servicio no disponible), usa el
+   * texto almacenado en el estado local como respaldo.
    */
-  downloadText() {
+  async downloadText() {
     const text = this.state.extractedText;
-    if (!text) return;
+    const documentId = this.state.documentId;
+    const selectedFile = this.state.selectedFile;
 
-    const baseName = this.state.selectedFile
-      ? this.state.selectedFile.name.replace(/\.pdf$/i, '')
+    if (!text && !documentId) return;
+
+    const baseName = selectedFile
+      ? selectedFile.name.replace(/\.pdf$/i, '')
       : 'documento';
     const filename = `${baseName}.md`;
 
-    this.view.downloadText(filename, text);
+    // Intento 1: descargar desde el endpoint del orquestador (disponible
+    // incluso tras recargar la página, ya que el documento está en MongoDB).
+    if (documentId) {
+      try {
+        const blob = await this.apiClient.downloadDocument(documentId);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        return;
+      } catch (err) {
+        console.warn('Descarga desde el orquestador falló, usando respaldo local:', err);
+      }
+    }
+
+    // Respaldo: usar el texto almacenado en el estado local.
+    if (text) {
+      this.view.downloadText(filename, text);
+    }
   }
 }
