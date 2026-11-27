@@ -1,6 +1,7 @@
 services:
   # ------------------------------------------------------------------
-  # Microservicio Front-End (Nginx sirviendo UI estática y proxy /api)
+  # Microservicio Front-End (Nginx sirviendo UI estatica)
+  # Discovery - Consul Catalog + Traefik centralizados en infraestructura (orchestrator #56)
   # ------------------------------------------------------------------
   frontend:
     build:
@@ -21,21 +22,6 @@ services:
       - "80"
     networks:
       - shared_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`universidad.localhost`) && !PathPrefix(`/api`)"
-      - "traefik.http.routers.frontend.entrypoints=https"
-      - "traefik.http.routers.frontend.tls=true"
-      - "traefik.http.routers.frontend.priority=1"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.path=/health"
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.interval=10s"
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.timeout=3s"
-      # Middlewares de resiliencia
-      - "traefik.http.middlewares.frontend-retry.retry.attempts=3"
-      - "traefik.http.middlewares.frontend-retry.retry.initialinterval=500ms"
-      - "traefik.http.middlewares.frontend-cb.circuitbreaker.expression=NetworkErrorRatio() > 0.30 || ResponseCodeRatio(500, 600, 0, 600) > 0.25"
-      - "traefik.http.routers.frontend.middlewares=frontend-retry,frontend-cb"
 
 # ------------------------------------------------------------------
 # Red externa compartida con la infraestructura central y backend

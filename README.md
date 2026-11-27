@@ -289,3 +289,7 @@ docker run --rm \
   -v "$(pwd)/.grype.yaml:/.grype.yaml:ro" \
   anchore/grype:latest docker:pdf-extractor-frontend:local -c /.grype.yaml -o json > grype-report.json
 ```
+
+## Integracion con Consul Discovery y Routing Externo
+
+El servicio rontend esta preparado para ser descubierto y enrutado externamente mediante **Consul Catalog + Traefik** desde la infraestructura central (orchestrator #56), sin labels 	raefik.* acopladas en docker-compose.yml. Consulta el contrato completo de puerto (80), endpoint de salud (/health) y metadata de registro en [docs/consul-discovery-routing.md](docs/consul-discovery-routing.md).
