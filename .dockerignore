@@ -17,3 +17,12 @@ scripts/
 build.ps1
 build.sh
 docker-compose.yml
+
+# Ignorar llaves, certificados, CI y reportes de auditoria
+*.pem
+*.key
+*.crt
+*.p12
+.github/
+.grype.yaml
+reports/

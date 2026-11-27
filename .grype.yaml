@@ -1,0 +1,15 @@
+# Politica de seguridad y escaneo de vulnerabilidades con Grype (Issue #53)
+# Umbral de fallo en CI: bloquea builds con CVEs de severidad HIGH o CRITICAL con parche disponible
+fail-on-severity: high
+only-fixed: true
+
+# Excepciones justificadas con trazabilidad y fecha de vencimiento obligatoria.
+# Formato requerido por auditoria:
+# ignore:
+#   - vulnerability: CVE-YYYY-NNNNN
+#     package:
+#       name: <paquete>
+#       type: apk
+#     reason: "<justificacion tecnica y analisis de no-explotabilidad en Nginx estatico>"
+#     expires: "YYYY-MM-DD"
+ignore: []
