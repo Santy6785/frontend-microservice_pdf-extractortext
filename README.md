@@ -141,7 +141,7 @@ Al desplegar la plataforma completa de microservicios sobre la red compartida `p
 
 ## 4. Configuración en Runtime
 
-El contenedor inyecta las variables de entorno en runtime mediante `envsubst` a través del script [`nginx/40-generate-config.sh`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/nginx/40-generate-config.sh):
+El contenedor inyecta las variables de entorno en runtime mediante `envsubst` a través del script [`nginx/40-generate-config.sh`](nginx/40-generate-config.sh):
 
 | Variable | Descripción | Valor por Defecto |
 |---|---|---|
@@ -222,7 +222,7 @@ Para ejecutar linting, todas las pruebas y construir la imagen Docker en un solo
 
 ## 6. Decisiones Arquitectónicas
 
-Para obtener el detalle completo de la excepción del front-end en endpoints operativos (/shutdown, /pause, /resume, /trace y métricas completas), consultar el [ADR-001](#adr-001-excepcion-del-front-end-en-endpoints-operativos-shutdown-pause-resume-trace-metricas-complejas) en `docs/decisiones.md`.
+Para obtener el detalle completo de la excepción del front-end en endpoints operativos (/shutdown, /pause, /resume, /trace y métricas completas), consultar el [ADR-001](docs/decisiones.md) (excepcion de endpoints operativos /trace, /pause, /resume, /shutdown en servidor estatico Nginx y apagado seguro via SIGQUIT) en `docs/decisiones.md`.
 
 ---
 
@@ -251,7 +251,7 @@ Para obtener el detalle completo de la excepción del front-end en endpoints ope
 ## 8. Contrato de API y OpenAPI Snapshot
 
 > [!NOTE]
-> Los archivos [`docs/api-contract.md`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/docs/api-contract.md) y [`docs/openapi.json`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/docs/openapi.json) incluidos en este repositorio son **snapshots** sincronizados para soporte del desarrollo, pruebas de integración con mocks y documentación técnica del equipo front-end.
+> Los archivos [`docs/api-contract.md`](docs/api-contract.md) y [`docs/openapi.json`](docs/openapi.json) incluidos en este repositorio son **snapshots** sincronizados para soporte del desarrollo, pruebas de integración con mocks y documentación técnica del equipo front-end.
 > 
 > **La fuente de verdad oficial del contrato y los esquemas es el repositorio del backend (monolito):**  
 > 👉 [pdf-extractortext](https://github.com/Santy6785/pdf-extractortext)
@@ -260,4 +260,4 @@ Para obtener el detalle completo de la excepción del front-end en endpoints ope
 
 ## 9. Licencia
 
-Este proyecto está bajo la licencia MIT. Consulta el archivo [`LICENSE`](file:///C:/Users/jerek/Desktop/Facultad/3ro/Desarrollo%20de%20Software/repo/frontend-microservice_pdf-extractortext/LICENSE) para más detalles.
+Este proyecto está bajo la licencia MIT. Consulta el archivo [`LICENSE`](LICENSE) para más detalles.

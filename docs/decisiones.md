@@ -1,6 +1,6 @@
 # ADR-001: Excepción del Front-end en Endpoints Operativos (/shutdown, /pause, /resume, /trace, Métricas Complejas)
 
-**Estado:** Propuesta  
+**Estado:** Aceptada  
 **Fecha:** 2026-11-04  
 **Alcance:** Microservicio front-end (Nginx sirviendo UI estática)
 
