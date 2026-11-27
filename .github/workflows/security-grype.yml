@@ -32,27 +32,14 @@ jobs:
           load: true
           tags: pdf-extractor-frontend:ci-${{ github.sha }}
 
-      - name: Run Grype scan (SARIF output)
-        id: grype-sarif
-        uses: anchore/scan-action@v4
-        with:
-          image: pdf-extractor-frontend:ci-${{ github.sha }}
-          acs-report-enable: false
-          fail-build: false
-          output-format: sarif
-          severity-cutoff: high
-          only-fixed: true
-
-      - name: Run Grype scan (JSON output & severity gate)
-        id: grype-json
-        uses: anchore/scan-action@v4
-        with:
-          image: pdf-extractor-frontend:ci-${{ github.sha }}
-          acs-report-enable: false
-          fail-build: true
-          output-format: json
-          severity-cutoff: high
-          only-fixed: true
+      - name: Run Grype scan (SARIF, JSON & severity gate)
+        id: grype-scan
+        run: |
+          mkdir -p reports
+          docker pull anchore/grype:latest
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)/.grype.yaml:/.grype.yaml:ro" anchore/grype:latest docker:pdf-extractor-frontend:ci-${{ github.sha }} -c /.grype.yaml -o sarif > reports/grype-report.sarif
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)/.grype.yaml:/.grype.yaml:ro" anchore/grype:latest docker:pdf-extractor-frontend:ci-${{ github.sha }} -c /.grype.yaml -o json > reports/grype-report.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)/.grype.yaml:/.grype.yaml:ro" anchore/grype:latest docker:pdf-extractor-frontend:ci-${{ github.sha }} -c /.grype.yaml --fail-on high --only-fixed
 
       - name: Upload Grype SARIF & JSON reports as artifacts
         if: always()
@@ -61,13 +48,14 @@ jobs:
           name: grype-security-reports-${{ github.run_number }}
           retention-days: 30
           path: |
-            ${{ steps.grype-sarif.outputs.sarif }}
-            ${{ steps.grype-json.outputs.json }}
+            reports/grype-report.sarif
+            reports/grype-report.json
+          if-no-files-found: warn
 
       - name: Upload SARIF report to GitHub Security tab
-        if: always() && steps.grype-sarif.outputs.sarif != ''
+        if: always() && hashFiles('reports/grype-report.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         continue-on-error: true
         with:
-          sarif_file: ${{ steps.grype-sarif.outputs.sarif }}
+          sarif_file: reports/grype-report.sarif
           category: grype-container-scan

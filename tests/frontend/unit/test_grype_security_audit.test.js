@@ -11,11 +11,12 @@ describe('Audit #53: Grype CI Pipeline, Severity Policy & Nginx Image Hygiene', 
   it('1. Defines Grype CI workflow with JSON and SARIF outputs and artifact upload', () => {
     assert.ok(existsSync('.github/workflows/security-grype.yml'));
     const workflow = readFileSync('.github/workflows/security-grype.yml', 'utf8');
-    assert.ok(workflow.includes('anchore/scan-action@v4'));
-    assert.ok(workflow.includes('output-format: sarif'));
-    assert.ok(workflow.includes('output-format: json'));
+    assert.ok(workflow.includes('anchore/grype:latest'));
+    assert.ok(workflow.includes('-c /.grype.yaml'));
+    assert.ok(workflow.includes('-o sarif'));
+    assert.ok(workflow.includes('-o json'));
     assert.ok(workflow.includes('actions/upload-artifact@v4'));
-    assert.ok(workflow.includes('fail-build: true'));
+    assert.ok(workflow.includes('--fail-on high'));
   });
 
   it('2. Defines severity policy and expiration-based exception schema in .grype.yaml', () => {
