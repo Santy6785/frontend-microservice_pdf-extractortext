@@ -79,3 +79,7 @@ curl -k -i -H "Host: universidad.localhost" https://localhost/
 # 3. Petición al healthcheck propio del frontend
 curl -k -i -H "Host: universidad.localhost" https://localhost/health
 ```
+---
+
+> [!NOTE]
+> **Actualizacion (Issue #54):** El descubrimiento y enrutamiento principal de este servicio migro a **Consul Catalog** en la infraestructura central (orchestrator #56). Por ello, docker-compose.yml ya no declara etiquetas 	raefik.*; el contrato completo de registro, metadata y healthcheck para Consul se encuentra en [docs/consul-discovery-routing.md](./consul-discovery-routing.md).
