@@ -2,6 +2,9 @@
 # Nginx sirviendo contenido estático con configuración en runtime vía envsubst
 FROM nginx:alpine
 
+# Aplicar parches de seguridad disponibles en paquetes base Alpine
+RUN apk upgrade --no-cache
+
 # Variables de entorno con valores por defecto
 ENV LOG_LEVEL=info
 ENV ACCESS_LOG=on

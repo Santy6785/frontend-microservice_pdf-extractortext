@@ -261,3 +261,31 @@ Para obtener el detalle completo de la excepción del front-end en endpoints ope
 ## 9. Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [`LICENSE`](LICENSE) para más detalles.
+
+## Escaneo de Seguridad y Vulnerabilidades (Grype)
+
+El repositorio incluye un pipeline automatizado en `.github/workflows/security-grype.yml` que construye la imagen final de Nginx y la audita con **Grype** bajo la politica definida en `.grype.yaml`:
+
+- **Politica de severidad**: El pipeline falla (`fail-build: true`) si detecta vulnerabilidades de severidad `HIGH` o `CRITICAL` con parche disponible (`only-fixed: true`).
+- **Trazabilidad y excepciones**: Cualquier excepcion requiere justificacion tecnica y fecha de vencimiento (`expires: "YYYY-MM-DD"`) en `.grype.yaml`.
+- **Artefactos**: Cada ejecucion publica los reportes completos en formato **JSON** y **SARIF** como *artifacts* del workflow (`grype-security-reports-<run>`).
+- **Dependencias**: El frontend es estatico (HTML/CSS/Vanilla JS sin paquetes runtime en `package.json`) y la imagen base `nginx:alpine` ejecuta `apk upgrade --no-cache` durante el build.
+
+### Ejecucion local del escaneo
+
+```bash
+# 1. Construir la imagen final
+docker build -t pdf-extractor-frontend:local .
+
+# 2. Escanear la imagen con Grype usando la politica del repositorio (sin instalar binarios locales)
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$(pwd)/.grype.yaml:/.grype.yaml:ro" \
+  anchore/grype:latest docker:pdf-extractor-frontend:local -c /.grype.yaml
+
+# 3. Exportar reportes JSON y SARIF localmente
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$(pwd)/.grype.yaml:/.grype.yaml:ro" \
+  anchore/grype:latest docker:pdf-extractor-frontend:local -c /.grype.yaml -o json > grype-report.json
+```
